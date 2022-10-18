@@ -16,7 +16,13 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Product
-        fields = ['id', 'name', 'slug', 'price', 'available']
+        fields = ['id', 'name', 'category', 'slug', 'price', 'available']
+        lookup_field = 'slug'
+        extra_kwargs = {
+            'url': {
+                'lookup_field': 'slug',
+            }
+        }
         read_only_fields = ('id',)
 
     def create(self, validated_data):
@@ -43,17 +49,21 @@ class ProductSerializer(serializers.ModelSerializer):
 class ProductDetailSerializer(ProductSerializer):
     """Serializer for product detail view."""
     
-    class Meta:
+    class Meta(ProductSerializer.Meta):
         fields = ProductSerializer.Meta.fields + ['description', 'image']
 
-class ProductSerializer(serializers.ModelSerializer):
+class ProductImageSerializer(serializers.ModelSerializer):
     """Serializer for uploading images to products."""
 
     class Meta:
         model = models.Product
         fields = ['id', 'image']
         read_only_fields = ('id',)
+        lookup_field = 'slug'
         extra_kwargs = {
+            'url': {
+                'lookup_field': 'slug',
+            },
             'image': {
                 'required': True
             },
