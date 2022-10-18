@@ -14,4 +14,8 @@ app/*/*/*/__pycache__/
 .env/
 venv/
 
-.api
+vol/
+vol
+
+.api/vol
+.api/vol/

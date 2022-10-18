@@ -10,6 +10,7 @@ services:
       - "8000:8000"
     volumes:
       - ./api:/api
+      - dev-static-data:/vol/web
     env_file:
       - .env
     depends_on:
@@ -18,8 +19,12 @@ services:
   db:
     image: postgres:14-alpine
     volumes:
-      - .api/data/db:/var/lib/postgresql/data
+      - dev-db-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
+
+volumes:
+  dev-db-data:
+  dev-static-data:

@@ -128,5 +128,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-.api
-.api/
+vol/
+vol
+
+.api/vol
+.api/vol/
