@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from shop import models
 
-class ModelsTestCase(TestCase):
+class ModelsTests(TestCase):
     """Test shop models."""
 
     def test_create_category_success(self):
