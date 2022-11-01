@@ -142,6 +142,43 @@ class AuthenticatedShopApiTests(TestCase):
         self.user = get_user_model().objects.create_user(email='user@example.com', first_name='John', last_name='Doe', password='test12345')
         self.client.force_authenticate(self.user)
 
+    def test_post_category_non_staff(self):
+        """Test POST method in category is not allowed for non staff users."""
+        response = self.client.post(CATEGORIES_URL, {})
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_post_product_non_staff(self):
+        """Test POST method in product is not allowed for non staff users."""
+        response = self.client.post(PRODUCTS_URL, {})
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_update_or_delete_category_non_staff(self):
+        """Test PUT, PATCH, DELETE methods in category is not allowed for non staff users."""
+        category = create_category(name='shirts')
+        response = self.client.put(detail_url(category_slug=category.slug), {})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        response = self.client.patch(detail_url(category_slug=category.slug), {})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        reponse = self.client.delete(detail_url(category_slug=category.slug))
+        self.assertEqual(reponse.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_update_or_delete_product_non_staff(self):
+        """Test PUT, PATCH, DELETE methods in product is not allowed for non staff users."""
+        category = create_category(name='shirts')
+        product = create_product(category=category)
+        response = self.client.put(detail_url(product_slug=product.slug), {})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        response = self.client.patch(detail_url(product_slug=product.slug), {})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        reponse = self.client.delete(detail_url(product_slug=product.slug))
+        self.assertEqual(reponse.status_code, status.HTTP_403_FORBIDDEN)
+
 class StaffShopApiTests(TestCase):
     """
     Test staff API requests.
