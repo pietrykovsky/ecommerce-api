@@ -39,7 +39,7 @@ class ProductSerializer(serializers.ModelSerializer):
         category = validated_data.pop('category', None)
         if category is not None:
             category_obj, create = models.Category.objects.get_or_create(**category)
-            instance.category.set(category_obj)
+            setattr(instance, 'category', category_obj)
         for k, v in validated_data.items():
             setattr(instance, k, v)
         instance.save()

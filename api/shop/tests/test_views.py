@@ -186,5 +186,96 @@ class StaffShopApiTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.admin = get_user_model().objects.create_superser(email='admin@example.com', first_name='John', last_name='Doe', password='test12345')
+        self.admin = get_user_model().objects.create_superuser(email='admin@example.com', first_name='John', last_name='Doe', password='test12345')
         self.client.force_authenticate(self.admin)
+
+    def test_post_category_staff(self):
+        """Test POST method in category is not allowed for staff users."""
+        payload = {
+        'name': 'shirts',
+        'slug': 'shirts',
+        }
+
+        response = self.client.post(CATEGORIES_URL, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        category = models.Category.objects.get(slug=payload['slug'])
+        self.assertIsNotNone(category)
+        for k, v in payload.items():
+            self.assertEqual(getattr(category, k), v)
+
+    def test_post_product_staff(self):
+        """Test POST method in product is not allowed for staff users."""
+        payload = {
+        'category': {
+            'name': 'shirts',
+            'slug': 'shirts'
+        },
+        'name': 'Super shirt',
+        'slug': 'super-shirt',
+        'price': Decimal('13.99'),
+        'available': True,
+        }
+
+        response = self.client.post(PRODUCTS_URL, payload, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        product = models.Product.objects.get(slug=response.data['slug'])
+        self.assertIsNotNone(product)
+        category = models.Category.objects.get(slug=payload['category']['slug'])
+        for k, v in payload.items():
+            if k == 'category':
+                self.assertEqual(getattr(product, k), category)
+            else:
+                self.assertEqual(getattr(product, k), v)
+
+    def test_update_or_delete_category_staff(self):
+        """Test PUT, PATCH, DELETE methods in category is not allowed for staff users."""
+        category = create_category(name='shirts')
+        payload = {
+            'name': 'pants',
+            'slug': 'pants',
+        }
+
+        response = self.client.put(detail_url(category_slug=category.slug), payload)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        category.refresh_from_db()
+        self.assertIsNotNone(category)
+        for k, v in payload.items():
+            self.assertEqual(getattr(category, k), v)
+
+        reponse = self.client.delete(detail_url(category_slug=category.slug))
+        self.assertEqual(reponse.status_code, status.HTTP_204_NO_CONTENT)
+        exists = models.Category.objects.filter(slug=category.slug).exists()
+        self.assertFalse(exists)
+
+    def test_update_or_delete_product_staff(self):
+        """Test PUT, PATCH, DELETE methods in product is not allowed for staff users."""
+        category = create_category(name='shirts')
+        payload = {
+        'category': {
+            'name': 'pants',
+            'slug': 'pants',
+        },
+        'name': 'Super pants',
+        'slug': 'super-pants',
+        'price': Decimal('16.99'),
+        'available': False,
+        }
+        product = create_product(category=category)
+
+        response = self.client.put(detail_url(product_slug=product.slug), payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        product.refresh_from_db()
+        self.assertIsNotNone(product)
+        category = models.Category.objects.get(slug=payload['category']['slug'])
+        for k, v in payload.items():
+            if k == 'category':
+                self.assertEqual(getattr(product, k), category)
+            else:
+                self.assertEqual(getattr(product, k), v)
+
+        reponse = self.client.delete(detail_url(product_slug=product.slug))
+        self.assertEqual(reponse.status_code, status.HTTP_204_NO_CONTENT)
+        exists = models.Product.objects.filter(slug=product.slug).exists()
+        self.assertFalse(exists)
