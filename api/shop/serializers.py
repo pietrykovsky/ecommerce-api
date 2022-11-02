@@ -16,7 +16,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Product
-        fields = ['id', 'name', 'category', 'slug', 'price', 'available']
+        fields = ['id', 'name', 'category', 'slug', 'price', 'available', 'image']
         lookup_field = 'slug'
         extra_kwargs = {
             'url': {
@@ -50,7 +50,7 @@ class ProductDetailSerializer(ProductSerializer):
     """Serializer for product detail view."""
     
     class Meta(ProductSerializer.Meta):
-        fields = ProductSerializer.Meta.fields + ['description', 'image']
+        fields = ProductSerializer.Meta.fields + ['description']
 
 class ProductImageSerializer(serializers.ModelSerializer):
     """Serializer for uploading images to products."""
