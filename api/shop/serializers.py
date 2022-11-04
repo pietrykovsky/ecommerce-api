@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework import validators
 
 from shop import models
 
@@ -10,9 +11,15 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'slug')
         read_only_fields = ('id',)
 
+class ProductCategorySerializer(serializers.Serializer):
+    """Category serializer for product serializer."""
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(max_length=200)
+    slug = serializers.SlugField(max_length=200)
+
 class ProductSerializer(serializers.ModelSerializer):
     """Serializer for products."""
-    category = CategorySerializer(required=True)
+    category = ProductCategorySerializer(required=True)
 
     class Meta:
         model = models.Product
@@ -21,7 +28,7 @@ class ProductSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'url': {
                 'lookup_field': 'slug',
-            }
+            },
         }
         read_only_fields = ('id',)
 
