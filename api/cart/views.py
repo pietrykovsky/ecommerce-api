@@ -19,17 +19,7 @@ from decimal import Decimal
 def cart_detail(request):
     """Show cart details."""
     cart = Cart(request)
-    products = [
-        {
-            'product': item['product'], 
-            'quantity': item['quantity'], 
-            'total_price': item['total_price'],
-        } for item in cart
-    ]
-    data = {
-        'products': products,
-        'total_price': Decimal(str(cart.get_total_price()))
-    }
+    data = cart.get_details()
     serializer = serializers.CartDetailSerializer(data)
     return Response(serializer.data, status=status.HTTP_200_OK)
 

@@ -34,6 +34,22 @@ class Cart:
         """Return the number of products in the cart."""
         return sum(item['quantity'] for item in self.cart.values())
 
+    def get_details(self):
+        """Return dictionary with data of the cart details."""
+        cart = self.cart.copy()
+        products = [
+            {
+                'product': item['product'], 
+                'quantity': item['quantity'], 
+                'total_price': item['total_price'],
+            } for item in cart
+        ]
+        data = {
+            'products': products,
+            'total_price': Decimal(str(self.get_total_price()))
+        }
+        return data
+
     def add(self, product, quantity=1, update_quantity=False):
         """Add a product to the cart or change its quantity."""
         product_id = str(product.id)
