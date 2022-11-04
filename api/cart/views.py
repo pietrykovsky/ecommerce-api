@@ -13,7 +13,7 @@ from . import serializers
 from decimal import Decimal
 
 @extend_schema(
-    responses={200: serializers.CartDetailSerializer}
+    responses=serializers.CartDetailSerializer
 )
 @api_view(['GET'])
 def cart_detail(request):
@@ -35,16 +35,10 @@ def cart_detail(request):
 
 @extend_schema(
     request=serializers.CartAddProductSerializer,
-    responses={
-        200: serializers.CartAddProductSerializer,
-        201: serializers.CartAddProductSerializer,
-        404: serializers.CartAddProductSerializer,
-        400: serializers.CartAddProductSerializer,
-
-    }
+    responses= serializers.CartAddProductSerializer
 )
 @api_view(['POST', 'PUT'])
-def cart_update(request):
+def cart_add(request):
     """Add or update quantity of the product in the cart."""
     serializer = serializers.CartAddProductSerializer(data=request.data)
     if serializer.is_valid():
@@ -63,12 +57,7 @@ def cart_update(request):
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@extend_schema(
-    responses={
-        404: None,
-        204: None
-    }
-)
+@extend_schema()
 @api_view(['DELETE'])
 def cart_remove(request, product_id):
     """Remove a product from the cart."""
@@ -77,11 +66,7 @@ def cart_remove(request, product_id):
     cart.remove(product)
     return Response(status=status.HTTP_204_NO_CONTENT)
 
-@extend_schema(
-    responses={
-        404: None,
-        204: None
-    })
+@extend_schema()
 @api_view(['DELETE'])
 def cart_clear(request):
     """Clear the cart."""

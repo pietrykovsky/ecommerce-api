@@ -6,7 +6,7 @@ from shop import models
 
 class Cart:
     """
-    Cart system class.
+    Cart system class to manage session.
     """
 
     def __init__(self, request):
