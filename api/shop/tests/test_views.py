@@ -190,7 +190,7 @@ class StaffShopApiTests(TestCase):
         self.client.force_authenticate(self.admin)
 
     def test_post_category_staff(self):
-        """Test POST method in category is not allowed for staff users."""
+        """Test POST method in category is allowed for staff users."""
         payload = {
         'name': 'shirts',
         'slug': 'shirts',
@@ -205,7 +205,33 @@ class StaffShopApiTests(TestCase):
             self.assertEqual(getattr(category, k), v)
 
     def test_post_product_staff(self):
-        """Test POST method in product is not allowed for staff users."""
+        """Test POST method in product is allowed for staff users."""
+        payload = {
+        'category': {
+            'name': 'shirts',
+            'slug': 'shirts'
+        },
+        'name': 'Super shirt',
+        'slug': 'super-shirt',
+        'price': Decimal('13.99'),
+        'available': True,
+        }
+
+        response = self.client.post(PRODUCTS_URL, payload, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        product = models.Product.objects.get(slug=response.data['slug'])
+        self.assertIsNotNone(product)
+        category = models.Category.objects.get(slug=payload['category']['slug'])
+        for k, v in payload.items():
+            if k == 'category':
+                self.assertEqual(getattr(product, k), category)
+            else:
+                self.assertEqual(getattr(product, k), v)
+
+    def test_post_product_with_existing_category_staff(self):
+        """Test create product with existing category is success for staff users."""
+        create_category(name='shirts', slug='shirts')
         payload = {
         'category': {
             'name': 'shirts',
@@ -250,7 +276,7 @@ class StaffShopApiTests(TestCase):
         self.assertFalse(exists)
 
     def test_update_or_delete_product_staff(self):
-        """Test PUT, PATCH, DELETE methods in product is not allowed for staff users."""
+        """Test PUT, PATCH, DELETE methods in product is allowed for staff users."""
         category = create_category(name='shirts')
         payload = {
         'category': {

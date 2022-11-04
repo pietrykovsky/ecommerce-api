@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework import validators
 
 from shop import models
 
@@ -10,18 +11,24 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'slug')
         read_only_fields = ('id',)
 
+class ProductCategorySerializer(serializers.Serializer):
+    """Category serializer for product serializer."""
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(max_length=200)
+    slug = serializers.SlugField(max_length=200)
+
 class ProductSerializer(serializers.ModelSerializer):
     """Serializer for products."""
-    category = CategorySerializer(required=True)
+    category = ProductCategorySerializer(required=True)
 
     class Meta:
         model = models.Product
-        fields = ['id', 'name', 'category', 'slug', 'price', 'available']
+        fields = ['id', 'name', 'category', 'slug', 'price', 'available', 'image']
         lookup_field = 'slug'
         extra_kwargs = {
             'url': {
                 'lookup_field': 'slug',
-            }
+            },
         }
         read_only_fields = ('id',)
 
@@ -50,7 +57,7 @@ class ProductDetailSerializer(ProductSerializer):
     """Serializer for product detail view."""
     
     class Meta(ProductSerializer.Meta):
-        fields = ProductSerializer.Meta.fields + ['description', 'image']
+        fields = ProductSerializer.Meta.fields + ['description']
 
 class ProductImageSerializer(serializers.ModelSerializer):
     """Serializer for uploading images to products."""
