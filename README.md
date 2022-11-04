@@ -1,4 +1,7 @@
 # ecommerce-api
+  Simple ecommerce REST API built with Django REST Framework.
+  
+  ![Preview image](preview/docs.jpg)
 
 ## tba
 * cart module tests
