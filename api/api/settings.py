@@ -30,7 +30,7 @@ ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL = 'user.User'
 
-CART_SESSION_ID = 'cart'
+CART_SESSION_ID = os.environ.get('CART_SESSION_ID', 'cart')
 
 # Application definition
 
